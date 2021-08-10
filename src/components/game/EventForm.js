@@ -109,7 +109,7 @@ export const EventForm = () => {
                         date: currentEvent.date,
                         time: currentEvent.time,
                         description: currentEvent.description,
-                        title: currentEvent.title,
+                        title: currentEvent.title
                     }
 
                     // Send POST request to your API
