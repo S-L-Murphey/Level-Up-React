@@ -14,7 +14,13 @@ export const GameList = (props) => {
         <article className="games">
             {
                 games.map(game => {
+                    //const gameEvents = events.filter(e => e.game.id === game.id)
                     return <section key={`game--${game.id}`} className="game">
+                        <div className="game__edit">
+                        <button className="btn btn-3"
+                                onClick={() => history.push(`/games/${game.id}/edit`)}
+                            >Edit</button>
+                        </div>
                         <div className="game__name">{game.name} by {game.maker}</div>
                         <div className="game__players">{game.number_of_players} players needed</div>
                         <div className="game__description">{game.description}</div>
