@@ -1,12 +1,13 @@
 import React, { useContext, useState, useEffect } from "react"
 import { GameContext } from "./GameProvider.js"
-import { useHistory } from "react-router-dom"
+import { useHistory, useParams } from "react-router-dom"
 
 
 
 export const GameForm = () => {
     const history = useHistory()
-    const { createGame, getGameTypes, gameTypes } = useContext(GameContext)
+    const { gameId } = useParams()
+    const { createGame, getGameTypes, gameTypes, editGame, getGame } = useContext(GameContext)
 
     /*
         Since the input fields are bound to the values of
@@ -29,6 +30,21 @@ export const GameForm = () => {
     useEffect(() => {
         getGameTypes()
     }, [])
+
+    useEffect(() => {
+        if (gameId) {
+            getGame(gameId).then(game => {
+                setCurrentGame({
+                    description: game.description,
+                    numberOfPlayers: game.numberOfPlayers,
+                    name: game.name,
+                    maker: game.maker,
+                    gamer: game.gamer,
+                    gameTypeId: game.gameTypeId
+                })
+            })
+        }
+    }, [gameId])
 
 
     /*
@@ -117,37 +133,58 @@ export const GameForm = () => {
                     <select type="select" name="gameTypeId" required autoFocus className="form-control"
                         value={currentGame.gameTypeId}
                         onChange={changeGameNameState}>
-                            <option value="0">Select Game Type</option>
-                            {gameTypes.map((element => {
-                                return <option value={element.id}>
-                                    {element.label}
-                                </option>
-                            }))}
-                        </select>
-                    
+                        <option value="0">Select Game Type</option>
+                        {gameTypes.map((element => {
+                            return <option value={element.id}>
+                                {element.label}
+                            </option>
+                        }))}
+                    </select>
+
                 </div>
             </fieldset>
 
-            {/* You create the rest of the input fields for each game property */}
+            {
+                (gameId)
+                    ? <button
+                        onClick={evt => {
+                            // Prevent form from being submitted
+                            evt.preventDefault()
 
-            <button type="submit"
-                onClick={evt => {
-                    // Prevent form from being submitted
-                    evt.preventDefault()
+                            const game = {
+                                id: gameId,
+                                maker: currentGame.maker,
+                                name: currentGame.name,
+                                numberOfPlayers: parseInt(currentGame.numberOfPlayers),
+                                description: currentGame.description,
+                                gameTypeId: parseInt(currentGame.gameTypeId)
+                            }
 
-                    const game = {
-                        maker: currentGame.maker,
-                        name: currentGame.name,
-                        numberOfPlayers: parseInt(currentGame.numberOfPlayers),
-                        description: currentGame.description,
-                        gameTypeId: parseInt(currentGame.gameTypeId)
-                    }
+                            // Send PUT request to your API
+                            editGame(game)
+                                .then(() => history.push("/games"))
+                        }}
+                        className="btn btn-primary">Edit Game</button>
+                    :
+                    <button type="submit"
+                        onClick={evt => {
+                            // Prevent form from being submitted
+                            evt.preventDefault()
 
-                    // Send POST request to your API
-                    createGame(game)
-                        .then(() => history.push("/games"))
-                }}
-                className="btn btn-primary">Create</button>
+                            const game = {
+                                maker: currentGame.maker,
+                                name: currentGame.name,
+                                numberOfPlayers: parseInt(currentGame.numberOfPlayers),
+                                description: currentGame.description,
+                                gameTypeId: parseInt(currentGame.gameTypeId)
+                            }
+
+                            // Send POST request to your API
+                            createGame(game)
+                                .then(() => history.push("/games"))
+                        }}
+                        className="btn btn-primary">Create Game</button>
+            }
         </form>
     )
 }

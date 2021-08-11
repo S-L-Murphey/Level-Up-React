@@ -14,6 +14,9 @@ export const NavBar = (props) => {
             <li className="navbar__item">
             <Link to="/events">Events</Link>
             </li>
+            <li className="navbar__item">
+            <Link to="/profile">Profile</Link>
+            </li>
             {
                 (localStorage.getItem("lu_token") !== null) ?
                     <li className="nav-item">
